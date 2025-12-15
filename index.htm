@@ -34,12 +34,16 @@
             height: 100%;
             padding: 1rem;
         }
+        
+        /* Ensure the main app container is the positioning context for center-aligned elements */
+        .game-app {
+            position: relative; 
+        }
 
         /* Mole Styles */
         .mole-container {
             cursor: pointer;
             transition: transform 0.3s ease-in-out;
-            /* Added 'relative' property for localized absolute positioning of feedback */
             position: relative; 
         }
 
@@ -96,10 +100,12 @@
         .whisker-right-1 { right: -20%; transform: rotate(15deg); transform-origin: left center; }
         .whisker-right-2 { right: -20%; transform: rotate(-15deg); transform-origin: left center; }
 
-        /* Feedback Animation - Now positioned relative to the clicked mole-container */
+        /* Feedback Animation - Now centered in the game area */
         .feedback {
             position: absolute;
-            /* Top is set in JS to place it near the word */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Initial center position */
             font-size: 3rem;
             font-weight: bold;
             animation: feedback-pop 0.5s ease-out;
@@ -107,11 +113,12 @@
             z-index: 20;
         }
 
-        /* Updated keyframes for localized vertical centering */
+        /* Updated keyframes for centered animation */
         @keyframes feedback-pop {
-            0% { transform: translateY(-50%) scale(0); opacity: 0; }
-            50% { transform: translateY(-50%) scale(1.5); opacity: 1; }
-            100% { transform: translateY(-50%) scale(1); opacity: 0; }
+            /* Ensure translate is applied throughout the animation to maintain center */
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 
+            50% { transform: translate(-50%, -50%) scale(2); opacity: 1; } /* Larger pop for impact */
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } 
         }
 
         .correct { color: #10B981; /* Green-500 */ }
@@ -403,33 +410,18 @@
         }
 
         /**
-         * Shows the feedback icon (✓ or ✗) next to the clicked word.
+         * Shows the feedback icon (✓ or ✗) in the center of the game area.
          * @param {boolean} isCorrect - True if the click was correct.
-         * @param {HTMLElement} containerElement - The #mole1 or #mole2 container.
-         * @param {string} side - 'left' or 'right'.
          */
-        function showFeedback(isCorrect, containerElement, side) {
+        function showFeedback(isCorrect) {
             const feedback = document.createElement('div');
             feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
             feedback.textContent = isCorrect ? '✓' : '✗';
             
-            // Position near the word, which sits below the mole (approx 65-70% down)
-            feedback.style.top = '65%'; 
-            feedback.style.transform = 'translateY(-50%)'; 
-
-            // Position to the side of the word for better visibility
-            if (side === 'left') {
-                // Place to the right of the left mole/word
-                feedback.style.right = '-20px';
-                feedback.style.left = 'auto';
-            } else {
-                // Place to the left of the right mole/word
-                feedback.style.left = '-20px';
-                feedback.style.right = 'auto';
-            }
+            // Append to the main game-app container to position it absolutely in the center
+            document.getElementById('game-app').appendChild(feedback); 
             
-            containerElement.appendChild(feedback); // Append to the specific container
-            
+            // The animation duration is 0.5s, so remove the element after the animation finishes
             setTimeout(() => feedback.remove(), 500);
         }
 
@@ -438,7 +430,6 @@
             if (!gameState.isPlaying) return;
 
             const isCorrect = side === gameState.correctSide;
-            const moleContainer = document.getElementById(side === 'left' ? 'mole1' : 'mole2');
 
             if (isCorrect) {
                 playCorrectSound();
@@ -463,13 +454,13 @@
                     }, 500);
                 }
                 
-                showFeedback(true, moleContainer, side);
+                showFeedback(true);
                 displayNewPair();
             } else {
                 playWrongSound();
                 gameState.combo = 0;
                 document.getElementById('combo').textContent = 0;
-                showFeedback(false, moleContainer, side);
+                showFeedback(false);
             }
         }
 
