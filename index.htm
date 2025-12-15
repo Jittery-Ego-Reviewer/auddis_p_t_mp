@@ -24,10 +24,23 @@
             overflow: hidden;
         }
 
+        /* Set the body background and centering */
+        .game-app-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            padding: 1rem;
+        }
+
         /* Mole Styles */
         .mole-container {
             cursor: pointer;
             transition: transform 0.3s ease-in-out;
+            /* Added 'relative' property for localized absolute positioning of feedback */
+            position: relative; 
         }
 
         .mole-container:active {
@@ -37,7 +50,7 @@
         .mole {
             width: 100%;
             aspect-ratio: 1;
-            max-width: 200px; /* Max size on desktop */
+            max-width: 200px;
             background: #6B4423;
             border-radius: 50% 50% 45% 45%;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
@@ -56,22 +69,8 @@
         }
 
         /* Mole Face Details */
-        .mole-ears {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-        .mole-ear {
-            position: absolute;
-            width: 20%;
-            height: 20%;
-            background: #5A3620;
-            border-radius: 50%;
-            top: 15%;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .mole-ears { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+        .mole-ear { position: absolute; width: 20%; height: 20%; background: #5A3620; border-radius: 50%; top: 15%; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
         .mole-ear-left { left: 5%; }
         .mole-ear-right { right: 5%; }
 
@@ -84,64 +83,23 @@
             transform: translateY(10%);
         }
 
-        .mole-eyes {
-            display: flex;
-            gap: 20%;
-        }
-
-        .mole-eye {
-            width: 15%;
-            aspect-ratio: 1;
-            background: #000;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        .mole-eye::after {
-            content: '';
-            position: absolute;
-            width: 30%;
-            height: 30%;
-            background: white;
-            border-radius: 50%;
-            top: 20%;
-            left: 20%;
-        }
-
-        .mole-nose {
-            width: 12%;
-            aspect-ratio: 1;
-            background: #FF69B4;
-            border-radius: 50%;
-        }
-
-        .mole-mouth {
-            width: 25%;
-            height: 8%;
-            border: 3px solid #000;
-            border-top: none;
-            border-radius: 0 0 50% 50%;
-        }
+        .mole-eyes { display: flex; gap: 20%; }
+        .mole-eye { width: 15%; aspect-ratio: 1; background: #000; border-radius: 50%; position: relative; }
+        .mole-eye::after { content: ''; position: absolute; width: 30%; height: 30%; background: white; border-radius: 50%; top: 20%; left: 20%; }
+        .mole-nose { width: 12%; aspect-ratio: 1; background: #FF69B4; border-radius: 50%; }
+        .mole-mouth { width: 25%; height: 8%; border: 3px solid #000; border-top: none; border-radius: 0 0 50% 50%; }
 
         /* Whiskers */
-        .whisker {
-            position: absolute;
-            width: 25%;
-            height: 2px;
-            background: #333;
-            top: 50%;
-        }
-
+        .whisker { position: absolute; width: 25%; height: 2px; background: #333; top: 50%; }
         .whisker-left-1 { left: -20%; transform: rotate(-15deg); transform-origin: right center; }
         .whisker-left-2 { left: -20%; transform: rotate(15deg); transform-origin: right center; }
         .whisker-right-1 { right: -20%; transform: rotate(15deg); transform-origin: left center; }
         .whisker-right-2 { right: -20%; transform: rotate(-15deg); transform-origin: left center; }
 
-        /* Feedback Animation */
+        /* Feedback Animation - Now positioned relative to the clicked mole-container */
         .feedback {
             position: absolute;
-            top: 50%;
-            transform: translate(-50%, -50%);
+            /* Top is set in JS to place it near the word */
             font-size: 3rem;
             font-weight: bold;
             animation: feedback-pop 0.5s ease-out;
@@ -149,10 +107,11 @@
             z-index: 20;
         }
 
+        /* Updated keyframes for localized vertical centering */
         @keyframes feedback-pop {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            0% { transform: translateY(-50%) scale(0); opacity: 0; }
+            50% { transform: translateY(-50%) scale(1.5); opacity: 1; }
+            100% { transform: translateY(-50%) scale(1); opacity: 0; }
         }
 
         .correct { color: #10B981; /* Green-500 */ }
@@ -177,125 +136,126 @@
         }
     </style>
 </head>
-<!-- Main body uses Tailwind for full-screen, background, and centering -->
-<body class="bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center p-4 sm:p-8">
-    <div id="game-app" class="game-app w-full h-full max-w-4xl max-h-[800px] bg-white rounded-xl shadow-2xl p-6 sm:p-10 flex flex-col overflow-auto">
 
-        <!-- Menu Screen -->
-        <div id="menu-screen">
-            <header class="text-center mb-8">
-                <h1 id="game-title" class="text-4xl sm:text-5xl font-extrabold text-indigo-600 mb-4 tracking-tight">
-                    打地鼠學發音
-                </h1>
-                <p class="text-gray-500 text-lg">選擇難度，聽發音並打下正確的字！</p>
-            </header>
+<body>
+    <div class="game-app-wrapper">
+        <div id="game-app" class="game-app w-full h-full max-w-4xl max-h-[800px] bg-white rounded-xl shadow-2xl p-6 sm:p-10 flex flex-col overflow-auto">
 
-            <div class="mode-selection flex justify-center flex-wrap gap-3 mb-8">
-                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="easy" id="easy-mode-btn">
-                    簡單 (60秒)
-                </button>
-                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="medium" id="medium-mode-btn">
-                    中等 (45秒)
-                </button>
-                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="hard" id="hard-mode-btn">
-                    困難 (30秒)
+            <!-- Menu Screen -->
+            <div id="menu-screen">
+                <header class="text-center mb-8">
+                    <h1 id="game-title" class="text-4xl sm:text-5xl font-extrabold text-indigo-600 mb-4 tracking-tight">
+                        打地鼠學發音
+                    </h1>
+                    <p class="text-gray-500 text-lg">選擇難度，聽發音並打下正確的字！</p>
+                </header>
+
+                <div class="mode-selection flex justify-center flex-wrap gap-3 mb-8">
+                    <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="easy" id="easy-mode-btn">
+                        簡單 (60秒)
+                    </button>
+                    <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="medium" id="medium-mode-btn">
+                        中等 (45秒)
+                    </button>
+                    <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="hard" id="hard-mode-btn">
+                        困難 (30秒)
+                    </button>
+                </div>
+                
+                <button class="start-btn text-2xl sm:text-3xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl mx-auto block" id="start-btn">
+                    開始遊戲
                 </button>
             </div>
-            
-            <button class="start-btn text-2xl sm:text-3xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl mx-auto block" id="start-btn">
-                開始遊戲
-            </button>
-        </div>
 
-        <!-- Game Screen -->
-        <div id="game-screen" class="hidden flex-1 flex flex-col">
-            <div class="game-stats flex justify-around mb-6 sm:mb-8 text-center gap-2 flex-wrap">
-                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
-                    <div id="score-label" class="text-xs sm:text-sm text-indigo-500 font-medium">分數</div>
-                    <div id="score" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
+            <!-- Game Screen -->
+            <div id="game-screen" class="hidden flex-1 flex flex-col">
+                <div class="game-stats flex justify-around mb-6 sm:mb-8 text-center gap-2 flex-wrap">
+                    <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                        <div id="score-label" class="text-xs sm:text-sm text-indigo-500 font-medium">分數</div>
+                        <div id="score" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
+                    </div>
+                    <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                        <div id="combo-label" class="text-xs sm:text-sm text-indigo-500 font-medium">連擊</div>
+                        <div id="combo" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
+                    </div>
+                    <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                        <div id="time-label" class="text-xs sm:text-sm text-indigo-500 font-medium">時間</div>
+                        <div id="timer" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">60</div>
+                    </div>
                 </div>
-                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
-                    <div id="combo-label" class="text-xs sm:text-sm text-indigo-500 font-medium">連擊</div>
-                    <div id="combo" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
-                </div>
-                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
-                    <div id="time-label" class="text-xs sm:text-sm text-indigo-500 font-medium">時間</div>
-                    <div id="timer" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">60</div>
-                </div>
-            </div>
 
-            <!-- This is where the core game happens -->
-            <div class="game-area flex-1 flex items-center justify-center relative p-4 gap-6 sm:gap-12" id="game-area">
-                <!-- Mole 1 -->
-                <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole1">
-                    <div class="mole">
-                        <div class="mole-ears">
-                            <div class="mole-ear mole-ear-left"></div>
-                            <div class="mole-ear mole-ear-right"></div>
-                        </div>
-                        <div class="mole-whiskers">
-                            <div class="whisker whisker-left-1"></div>
-                            <div class="whisker whisker-left-2"></div>
-                            <div class="whisker whisker-right-1"></div>
-                            <div class="whisker whisker-right-2"></div>
-                        </div>
-                        <div class="mole-face">
-                            <div class="mole-eyes">
-                                <div class="mole-eye"></div>
-                                <div class="mole-eye"></div>
+                <!-- This is where the core game happens -->
+                <div class="game-area flex-1 flex items-center justify-center relative p-4 gap-6 sm:gap-12" id="game-area">
+                    <!-- Mole 1 -->
+                    <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole1">
+                        <div class="mole">
+                            <div class="mole-ears">
+                                <div class="mole-ear mole-ear-left"></div>
+                                <div class="mole-ear mole-ear-right"></div>
                             </div>
-                            <div class="mole-nose"></div>
-                            <div class="mole-mouth"></div>
-                        </div>
-                    </div>
-                    <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word1">
-                        貼
-                    </div>
-                </div>
-
-                <!-- Mole 2 -->
-                <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole2">
-                    <div class="mole">
-                        <div class="mole-ears">
-                            <div class="mole-ear mole-ear-left"></div>
-                            <div class="mole-ear mole-ear-right"></div>
-                        </div>
-                        <div class="mole-whiskers">
-                            <div class="whisker whisker-left-1"></div>
-                            <div class="whisker whisker-left-2"></div>
-                            <div class="whisker whisker-right-1"></div>
-                            <div class="whisker whisker-right-2"></div>
-                        </div>
-                        <div class="mole-face">
-                            <div class="mole-eyes">
-                                <div class="mole-eye"></div>
-                                <div class="mole-eye"></div>
+                            <div class="mole-whiskers">
+                                <div class="whisker whisker-left-1"></div>
+                                <div class="whisker whisker-left-2"></div>
+                                <div class="whisker whisker-right-1"></div>
+                                <div class="whisker whisker-right-2"></div>
                             </div>
-                            <div class="mole-nose"></div>
-                            <div class="mole-mouth"></div>
+                            <div class="mole-face">
+                                <div class="mole-eyes">
+                                    <div class="mole-eye"></div>
+                                    <div class="mole-eye"></div>
+                                </div>
+                                <div class="mole-nose"></div>
+                                <div class="mole-mouth"></div>
+                            </div>
+                        </div>
+                        <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word1">
+                            貼
                         </div>
                     </div>
-                    <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word2">
-                        鐵
+
+                    <!-- Mole 2 -->
+                    <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole2">
+                        <div class="mole">
+                            <div class="mole-ears">
+                                <div class="mole-ear mole-ear-left"></div>
+                                <div class="mole-ear mole-ear-right"></div>
+                            </div>
+                            <div class="mole-whiskers">
+                                <div class="whisker whisker-left-1"></div>
+                                <div class="whisker whisker-left-2"></div>
+                                <div class="whisker whisker-right-1"></div>
+                                <div class="whisker whisker-right-2"></div>
+                            </div>
+                            <div class="mole-face">
+                                <div class="mole-eyes">
+                                    <div class="mole-eye"></div>
+                                    <div class="mole-eye"></div>
+                                </div>
+                                <div class="mole-nose"></div>
+                                <div class="mole-mouth"></div>
+                            </div>
+                        </div>
+                        <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word2">
+                            鐵
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Game Over Screen -->
-        <div id="game-over-screen" class="hidden game-over-screen text-center flex-1 flex flex-col justify-center items-center">
-            <h2 id="game-over-text" class="text-5xl sm:text-6xl font-extrabold text-indigo-600 mb-6">遊戲結束！</h2>
-            <div id="final-score" class="text-3xl sm:text-4xl font-bold text-gray-700 mb-10">
-                你的分數：0
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="hidden game-over-screen text-center flex-1 flex flex-col justify-center items-center">
+                <h2 id="game-over-text" class="text-5xl sm:text-6xl font-extrabold text-indigo-600 mb-6">遊戲結束！</h2>
+                <div id="final-score" class="text-3xl sm:text-4xl font-bold text-gray-700 mb-10">
+                    你的分數：0
+                </div>
+                <button class="start-btn text-xl sm:text-2xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 transition shadow-lg hover:shadow-xl" id="play-again-btn">
+                    再玩一次
+                </button>
             </div>
-            <button class="start-btn text-xl sm:text-2xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 transition shadow-lg hover:shadow-xl" id="play-again-btn">
-                再玩一次
-            </button>
         </div>
     </div>
 
     <script>
-        // Configuration for text customization (using the original structure)
         const defaultConfig = {
             game_title: "打地鼠學發音",
             easy_mode_label: "簡單 (60秒)",
@@ -309,7 +269,6 @@
             play_again_text: "再玩一次"
         };
 
-        // Word pairs for the game (p: primary/correct, t: tempting/similar)
         const wordPairs = [
             { p: "貼", t: "鐵" }, { p: "合", t: "核" }, { p: "十", t: "實" },
             { p: "鴨", t: "壓" }, { p: "蠟", t: "辣" }, { p: "攝", t: "舌" },
@@ -331,7 +290,7 @@
             correctSide: null
         };
 
-        // --- Audio Functions (Using Tone.js is generally better, but sticking to Oscillator for single-file) ---
+        // --- Audio Functions ---
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
         function playSound(frequency, duration, type = 'sine') {
@@ -374,7 +333,6 @@
         }
         // --- End Audio Functions ---
 
-        // Function to update all text elements based on config
         function updateUI(config) {
             document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
             document.getElementById('easy-mode-btn').textContent = config.easy_mode_label || defaultConfig.easy_mode_label;
@@ -386,33 +344,28 @@
             document.getElementById('time-label').textContent = config.time_label || defaultConfig.time_label;
             document.getElementById('game-over-text').textContent = config.game_over_text || defaultConfig.game_over_text;
             document.getElementById('play-again-btn').textContent = config.play_again_text || defaultConfig.play_again_text;
-            // Update labels for the game over screen
             document.getElementById('game-over-screen').querySelector('h2').textContent = config.game_over_text || defaultConfig.game_over_text;
         }
-
-        // Initialize UI with default configuration
+        
         updateUI(defaultConfig);
 
         // Event listener for mode selection
         document.querySelectorAll('.mode-btn').forEach(btn => {
-            // Apply selected class on initialization for the default mode
+            // Initial selection styling
             if (btn.dataset.mode === gameState.mode) {
                 btn.classList.add('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
                 btn.classList.remove('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
             }
 
             btn.addEventListener('click', () => {
-                // Remove selection classes from all buttons
                 document.querySelectorAll('.mode-btn').forEach(b => {
                     b.classList.remove('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
                     b.classList.add('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
                 });
 
-                // Add selection classes to the clicked button
                 btn.classList.add('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
                 btn.classList.remove('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
 
-                // Update game state
                 gameState.mode = btn.dataset.mode;
                 gameState.timeLimit = 
                     btn.dataset.mode === 'easy' ? 60 : 
@@ -421,12 +374,10 @@
             });
         });
 
-        // Function to select a random pair of words
         function getRandomPair() {
             return wordPairs[Math.floor(Math.random() * wordPairs.length)];
         }
 
-        // Function to display the new word pair
         function displayNewPair() {
             gameState.currentPair = getRandomPair();
             gameState.correctSide = Math.random() < 0.5 ? 'left' : 'right';
@@ -436,7 +387,6 @@
             const mole1El = document.getElementById('mole1').querySelector('.mole');
             const mole2El = document.getElementById('mole2').querySelector('.mole');
 
-            // Assign the correct (p) and tempting (t) words to the mole containers
             if (gameState.correctSide === 'left') {
                 word1El.textContent = gameState.currentPair.p;
                 word2El.textContent = gameState.currentPair.t;
@@ -445,33 +395,42 @@
                 word2El.textContent = gameState.currentPair.p;
             }
 
-            // Re-trigger the pop-up animation
             [mole1El, mole2El].forEach(mole => {
-                // Necessary trick to restart CSS animation
                 mole.style.animation = 'none';
-                void mole.offsetWidth; // Trigger reflow
+                void mole.offsetWidth;
                 mole.style.animation = 'pop-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27)';
             });
         }
 
-        // Function to show visual feedback (✓ or ✗)
-        function showFeedback(isCorrect, side) {
+        /**
+         * Shows the feedback icon (✓ or ✗) next to the clicked word.
+         * @param {boolean} isCorrect - True if the click was correct.
+         * @param {HTMLElement} containerElement - The #mole1 or #mole2 container.
+         * @param {string} side - 'left' or 'right'.
+         */
+        function showFeedback(isCorrect, containerElement, side) {
             const feedback = document.createElement('div');
             feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
             feedback.textContent = isCorrect ? '✓' : '✗';
             
-            // Adjust X position based on which mole was clicked (left or right)
+            // Position near the word, which sits below the mole (approx 65-70% down)
+            feedback.style.top = '65%'; 
+            feedback.style.transform = 'translateY(-50%)'; 
+
+            // Position to the side of the word for better visibility
             if (side === 'left') {
-                feedback.style.left = '25%';
-                feedback.style.transform = 'translate(-50%, -50%)'; // Only half translation is needed since we set left: 25%
+                // Place to the right of the left mole/word
+                feedback.style.right = '-20px';
+                feedback.style.left = 'auto';
             } else {
-                feedback.style.left = '75%';
-                feedback.style.transform = 'translate(-50%, -50%)';
+                // Place to the left of the right mole/word
+                feedback.style.left = '-20px';
+                feedback.style.right = 'auto';
             }
             
-            document.getElementById('game-area').appendChild(feedback);
+            containerElement.appendChild(feedback); // Append to the specific container
             
-            setTimeout(() => feedback.remove(), 500); // Remove feedback after animation
+            setTimeout(() => feedback.remove(), 500);
         }
 
         // Core game logic for handling a mole click
@@ -479,6 +438,7 @@
             if (!gameState.isPlaying) return;
 
             const isCorrect = side === gameState.correctSide;
+            const moleContainer = document.getElementById(side === 'left' ? 'mole1' : 'mole2');
 
             if (isCorrect) {
                 playCorrectSound();
@@ -486,7 +446,7 @@
                 
                 let points = 10;
                 if (gameState.combo >= 3) {
-                    points = 20; // Bonus points for combo
+                    points = 20;
                     playComboSound();
                 }
                 
@@ -495,7 +455,6 @@
                 document.getElementById('score').textContent = gameState.score;
                 document.getElementById('combo').textContent = gameState.combo;
                 
-                // Combo styling
                 const comboEl = document.getElementById('combo');
                 if (gameState.combo >= 3) {
                     comboEl.classList.add('text-red-500', 'combo-indicator');
@@ -504,14 +463,13 @@
                     }, 500);
                 }
                 
-                showFeedback(true, side);
+                showFeedback(true, moleContainer, side);
                 displayNewPair();
             } else {
                 playWrongSound();
-                gameState.combo = 0; // Reset combo on mistake
+                gameState.combo = 0;
                 document.getElementById('combo').textContent = 0;
-                showFeedback(false, side);
-                // Note: No new pair is displayed on wrong hit to penalize the user more
+                showFeedback(false, moleContainer, side);
             }
         }
 
@@ -519,7 +477,6 @@
         document.getElementById('mole1').addEventListener('click', () => handleMoleClick('left'));
         document.getElementById('mole2').addEventListener('click', () => handleMoleClick('right'));
 
-        // Start Game function
         function startGame() {
             gameState.score = 0;
             gameState.combo = 0;
@@ -536,7 +493,6 @@
 
             displayNewPair();
 
-            // Set up the game timer
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
                 document.getElementById('timer').textContent = gameState.timeLeft;
@@ -547,7 +503,6 @@
             }, 1000);
         }
 
-        // End Game function
         function endGame() {
             gameState.isPlaying = false;
             clearInterval(gameState.timer);
@@ -559,14 +514,12 @@
             document.getElementById('final-score').textContent = `你的分數：${gameState.score}`;
         }
 
-        // Event listeners for game flow
         document.getElementById('start-btn').addEventListener('click', startGame);
         document.getElementById('play-again-btn').addEventListener('click', () => {
             document.getElementById('game-over-screen').classList.add('hidden');
             document.getElementById('menu-screen').classList.remove('hidden');
         });
 
-        // Ensure the correct mode button is selected initially (for refresh)
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelector(`.mode-btn[data-mode="${gameState.mode}"]`).click();
         });
