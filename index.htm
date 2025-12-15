@@ -1,752 +1,575 @@
 <!doctype html>
 <html lang="zh-HK">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>粵語發音遊戲</title>
-  <script src="/_sdk/element_sdk.js"></script>
-  <style>
-    body {
-      box-sizing: border-box;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打地鼠發音遊戲</title>
+    <!-- Load Tailwind CSS for utility classes and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the complex Mole shape and animations */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap');
 
-    html, body {
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
+        /* Base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+        html, body {
+            height: 100%;
+            width: 100%;
+            font-family: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            overflow: hidden;
+        }
 
-    .game-container {
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-      max-height: 100%;
-      background: white;
-      border-radius: 0;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      padding: 5%;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
+        /* Mole Styles */
+        .mole-container {
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
 
-    .game-header {
-      text-align: center;
-      margin-bottom: 4%;
-    }
+        .mole-container:active {
+            transform: scale(0.95);
+        }
 
-    .game-title {
-      font-size: 8vmin;
-      font-weight: bold;
-      color: #667eea;
-      margin-bottom: 2%;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
+        .mole {
+            width: 100%;
+            aspect-ratio: 1;
+            max-width: 200px; /* Max size on desktop */
+            background: #6B4423;
+            border-radius: 50% 50% 45% 45%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            animation: pop-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
 
-    .mode-selection {
-      display: flex;
-      gap: 3%;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 4%;
-    }
+        @keyframes pop-up {
+            0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
 
-    .mode-btn {
-      padding: 3% 6%;
-      font-size: 4vmin;
-      border: 3px solid #667eea;
-      background: white;
-      color: #667eea;
-      border-radius: 15px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: bold;
-      min-width: 25%;
-    }
+        /* Mole Face Details */
+        .mole-ears {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+        .mole-ear {
+            position: absolute;
+            width: 20%;
+            height: 20%;
+            background: #5A3620;
+            border-radius: 50%;
+            top: 15%;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .mole-ear-left { left: 5%; }
+        .mole-ear-right { right: 5%; }
 
-    .mode-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-    }
+        .mole-face {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+            width: 80%;
+            transform: translateY(10%);
+        }
 
-    .mode-btn.selected {
-      background: #667eea;
-      color: white;
-    }
+        .mole-eyes {
+            display: flex;
+            gap: 20%;
+        }
 
-    .start-btn {
-      padding: 4% 10%;
-      font-size: 5vmin;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 25px;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: bold;
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-      margin: 0 auto;
-      display: block;
-    }
+        .mole-eye {
+            width: 15%;
+            aspect-ratio: 1;
+            background: #000;
+            border-radius: 50%;
+            position: relative;
+        }
 
-    .start-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
-    }
+        .mole-eye::after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 30%;
+            background: white;
+            border-radius: 50%;
+            top: 20%;
+            left: 20%;
+        }
 
-    .game-stats {
-      display: flex;
-      justify-content: space-around;
-      margin-bottom: 4%;
-      font-size: 4vmin;
-      font-weight: bold;
-      flex-wrap: wrap;
-      gap: 3%;
-    }
+        .mole-nose {
+            width: 12%;
+            aspect-ratio: 1;
+            background: #FF69B4;
+            border-radius: 50%;
+        }
 
-    .stat {
-      background: #f0f4ff;
-      padding: 3%;
-      border-radius: 15px;
-      min-width: 28%;
-      text-align: center;
-    }
+        .mole-mouth {
+            width: 25%;
+            height: 8%;
+            border: 3px solid #000;
+            border-top: none;
+            border-radius: 0 0 50% 50%;
+        }
 
-    .stat-label {
-      color: #667eea;
-      font-size: 3vmin;
-    }
+        /* Whiskers */
+        .whisker {
+            position: absolute;
+            width: 25%;
+            height: 2px;
+            background: #333;
+            top: 50%;
+        }
 
-    .stat-value {
-      color: #333;
-      font-size: 5vmin;
-      margin-top: 1%;
-    }
+        .whisker-left-1 { left: -20%; transform: rotate(-15deg); transform-origin: right center; }
+        .whisker-left-2 { left: -20%; transform: rotate(15deg); transform-origin: right center; }
+        .whisker-right-1 { right: -20%; transform: rotate(15deg); transform-origin: left center; }
+        .whisker-right-2 { right: -20%; transform: rotate(-15deg); transform-origin: left center; }
 
-    .combo-indicator {
-      color: #ff6b6b;
-      font-weight: bold;
-      animation: pulse 0.5s ease-in-out;
-    }
+        /* Feedback Animation */
+        .feedback {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            animation: feedback-pop 0.5s ease-out;
+            pointer-events: none;
+            z-index: 20;
+        }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-    }
+        @keyframes feedback-pop {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
 
-    .game-area {
-      flex: 1;
-      display: flex;
-      gap: 5%;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-      min-height: 40%;
-    }
+        .correct { color: #10B981; /* Green-500 */ }
+        .wrong { color: #EF4444; /* Red-500 */ }
 
-    .mole-container {
-      flex: 1;
-      max-width: 45%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
+        .hidden {
+            display: none;
+        }
 
-    .mole-container:hover {
-      transform: scale(1.05);
-    }
+        /* Responsive adjustments for game area */
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                gap: 2.5rem !important; /* Increase vertical gap on mobile */
+            }
+            .mole-container {
+                max-width: 80%;
+            }
+            .mole {
+                max-width: 180px;
+            }
+        }
+    </style>
+</head>
+<!-- Main body uses Tailwind for full-screen, background, and centering -->
+<body class="bg-gradient-to-br from-indigo-500 to-purple-700 flex items-center justify-center p-4 sm:p-8">
+    <div id="game-app" class="game-app w-full h-full max-w-4xl max-h-[800px] bg-white rounded-xl shadow-2xl p-6 sm:p-10 flex flex-col overflow-auto">
 
-    .mole {
-      width: 100%;
-      aspect-ratio: 1;
-      max-width: 300px;
-      background: #6B4423;
-      border-radius: 50% 50% 45% 45%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      position: relative;
-      animation: pop-up 0.3s ease-out;
-    }
+        <!-- Menu Screen -->
+        <div id="menu-screen">
+            <header class="text-center mb-8">
+                <h1 id="game-title" class="text-4xl sm:text-5xl font-extrabold text-indigo-600 mb-4 tracking-tight">
+                    打地鼠學發音
+                </h1>
+                <p class="text-gray-500 text-lg">選擇難度，聽發音並打下正確的字！</p>
+            </header>
 
-    @keyframes pop-up {
-      0% { transform: translateY(50px) scale(0.5); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
-    }
-
-    .mole-face {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5%;
-      width: 80%;
-    }
-
-    .mole-eyes {
-      display: flex;
-      gap: 20%;
-      margin-bottom: 2%;
-    }
-
-    .mole-eye {
-      width: 15%;
-      aspect-ratio: 1;
-      background: #000;
-      border-radius: 50%;
-      position: relative;
-    }
-
-    .mole-eye::after {
-      content: '';
-      position: absolute;
-      width: 30%;
-      height: 30%;
-      background: white;
-      border-radius: 50%;
-      top: 20%;
-      left: 20%;
-    }
-
-    .mole-nose {
-      width: 12%;
-      aspect-ratio: 1;
-      background: #FF69B4;
-      border-radius: 50%;
-      margin-bottom: 3%;
-    }
-
-    .mole-mouth {
-      width: 25%;
-      height: 8%;
-      border: 3px solid #000;
-      border-top: none;
-      border-radius: 0 0 50% 50%;
-    }
-
-    .mole-whiskers {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-    }
-
-    .whisker {
-      position: absolute;
-      width: 25%;
-      height: 2px;
-      background: #333;
-      top: 50%;
-    }
-
-    .whisker-left-1 {
-      left: -20%;
-      transform: rotate(-15deg);
-      transform-origin: right center;
-    }
-
-    .whisker-left-2 {
-      left: -20%;
-      transform: rotate(15deg);
-      transform-origin: right center;
-    }
-
-    .whisker-right-1 {
-      right: -20%;
-      transform: rotate(15deg);
-      transform-origin: left center;
-    }
-
-    .whisker-right-2 {
-      right: -20%;
-      transform: rotate(-15deg);
-      transform-origin: left center;
-    }
-
-    .mole-ears {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-    }
-
-    .mole-ear {
-      position: absolute;
-      width: 20%;
-      height: 20%;
-      background: #5A3620;
-      border-radius: 50%;
-      top: 15%;
-    }
-
-    .mole-ear-left {
-      left: 5%;
-    }
-
-    .mole-ear-right {
-      right: 5%;
-    }
-
-    .word {
-      margin-top: 5%;
-      font-size: 6vmin;
-      font-weight: bold;
-      color: #333;
-      background: white;
-      padding: 4% 8%;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-
-    .feedback {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 10vmin;
-      font-weight: bold;
-      animation: feedback-pop 0.5s ease-out;
-      pointer-events: none;
-    }
-
-    @keyframes feedback-pop {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-    }
-
-    .correct { color: #4CAF50; }
-    .wrong { color: #ff6b6b; }
-
-    .game-over-screen {
-      text-align: center;
-    }
-
-    .final-score {
-      font-size: 8vmin;
-      color: #667eea;
-      margin-bottom: 5%;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-      .game-container {
-        padding: 8%;
-      }
-
-      .mode-btn {
-        font-size: 5vmin;
-        min-width: 28%;
-      }
-
-      .game-area {
-        flex-direction: column;
-        gap: 8%;
-      }
-
-      .mole-container {
-        max-width: 70%;
-      }
-    }
-
-    @media (orientation: landscape) and (max-height: 600px) {
-      .game-container {
-        padding: 2% 5%;
-      }
-
-      .game-header {
-        margin-bottom: 2%;
-      }
-
-      .mode-selection {
-        margin-bottom: 2%;
-      }
-
-      .game-stats {
-        margin-bottom: 2%;
-      }
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
- </head>
- <body>
-  <div class="game-container">
-   <div id="menu-screen">
-    <div class="game-header">
-     <h1 class="game-title" id="game-title">打地�����學發音</h1>
-    </div>
-    <div class="mode-selection"><button class="mode-btn selected" data-mode="easy" id="easy-mode-btn">簡單 (60秒)</button> <button class="mode-btn" data-mode="medium" id="medium-mode-btn">中等 (45秒)</button> <button class="mode-btn" data-mode="hard" id="hard-mode-btn">困難 (30秒)</button>
-    </div><button class="start-btn" id="start-btn">開始遊戲</button>
-   </div>
-   <div id="game-screen" class="hidden">
-    <div class="game-stats">
-     <div class="stat">
-      <div class="stat-label" id="score-label">
-       分數
-      </div>
-      <div class="stat-value" id="score">
-       0
-      </div>
-     </div>
-     <div class="stat">
-      <div class="stat-label" id="combo-label">
-       連擊
-      </div>
-      <div class="stat-value" id="combo">
-       0
-      </div>
-     </div>
-     <div class="stat">
-      <div class="stat-label" id="time-label">
-       時間
-      </div>
-      <div class="stat-value" id="timer">
-       60
-      </div>
-     </div>
-    </div>
-    <div class="game-area" id="game-area">
-     <div class="mole-container" id="mole1">
-      <div class="mole">
-       <div class="mole-ears">
-        <div class="mole-ear mole-ear-left"></div>
-        <div class="mole-ear mole-ear-right"></div>
-       </div>
-       <div class="mole-whiskers">
-        <div class="whisker whisker-left-1"></div>
-        <div class="whisker whisker-left-2"></div>
-        <div class="whisker whisker-right-1"></div>
-        <div class="whisker whisker-right-2"></div>
-       </div>
-       <div class="mole-face">
-        <div class="mole-eyes">
-         <div class="mole-eye"></div>
-         <div class="mole-eye"></div>
+            <div class="mode-selection flex justify-center flex-wrap gap-3 mb-8">
+                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="easy" id="easy-mode-btn">
+                    簡單 (60秒)
+                </button>
+                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="medium" id="medium-mode-btn">
+                    中等 (45秒)
+                </button>
+                <button class="mode-btn px-4 py-2 text-lg sm:text-xl font-bold rounded-xl transition shadow-md border-2 border-indigo-500 text-indigo-500 bg-white hover:bg-indigo-50" data-mode="hard" id="hard-mode-btn">
+                    困難 (30秒)
+                </button>
+            </div>
+            
+            <button class="start-btn text-2xl sm:text-3xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl mx-auto block" id="start-btn">
+                開始遊戲
+            </button>
         </div>
-        <div class="mole-nose"></div>
-        <div class="mole-mouth"></div>
-       </div>
-      </div>
-      <div class="word" id="word1">
-       貼
-      </div>
-     </div>
-     <div class="mole-container" id="mole2">
-      <div class="mole">
-       <div class="mole-ears">
-        <div class="mole-ear mole-ear-left"></div>
-        <div class="mole-ear mole-ear-right"></div>
-       </div>
-       <div class="mole-whiskers">
-        <div class="whisker whisker-left-1"></div>
-        <div class="whisker whisker-left-2"></div>
-        <div class="whisker whisker-right-1"></div>
-        <div class="whisker whisker-right-2"></div>
-       </div>
-       <div class="mole-face">
-        <div class="mole-eyes">
-         <div class="mole-eye"></div>
-         <div class="mole-eye"></div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden flex-1 flex flex-col">
+            <div class="game-stats flex justify-around mb-6 sm:mb-8 text-center gap-2 flex-wrap">
+                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                    <div id="score-label" class="text-xs sm:text-sm text-indigo-500 font-medium">分數</div>
+                    <div id="score" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
+                </div>
+                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                    <div id="combo-label" class="text-xs sm:text-sm text-indigo-500 font-medium">連擊</div>
+                    <div id="combo" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">0</div>
+                </div>
+                <div class="stat bg-gray-100 p-3 sm:p-4 rounded-xl shadow-inner flex-1 min-w-[30%]">
+                    <div id="time-label" class="text-xs sm:text-sm text-indigo-500 font-medium">時間</div>
+                    <div id="timer" class="text-2xl sm:text-4xl font-extrabold text-gray-800 mt-1">60</div>
+                </div>
+            </div>
+
+            <!-- This is where the core game happens -->
+            <div class="game-area flex-1 flex items-center justify-center relative p-4 gap-6 sm:gap-12" id="game-area">
+                <!-- Mole 1 -->
+                <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole1">
+                    <div class="mole">
+                        <div class="mole-ears">
+                            <div class="mole-ear mole-ear-left"></div>
+                            <div class="mole-ear mole-ear-right"></div>
+                        </div>
+                        <div class="mole-whiskers">
+                            <div class="whisker whisker-left-1"></div>
+                            <div class="whisker whisker-left-2"></div>
+                            <div class="whisker whisker-right-1"></div>
+                            <div class="whisker whisker-right-2"></div>
+                        </div>
+                        <div class="mole-face">
+                            <div class="mole-eyes">
+                                <div class="mole-eye"></div>
+                                <div class="mole-eye"></div>
+                            </div>
+                            <div class="mole-nose"></div>
+                            <div class="mole-mouth"></div>
+                        </div>
+                    </div>
+                    <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word1">
+                        貼
+                    </div>
+                </div>
+
+                <!-- Mole 2 -->
+                <div class="mole-container flex flex-col items-center flex-1 max-w-[50%]" id="mole2">
+                    <div class="mole">
+                        <div class="mole-ears">
+                            <div class="mole-ear mole-ear-left"></div>
+                            <div class="mole-ear mole-ear-right"></div>
+                        </div>
+                        <div class="mole-whiskers">
+                            <div class="whisker whisker-left-1"></div>
+                            <div class="whisker whisker-left-2"></div>
+                            <div class="whisker whisker-right-1"></div>
+                            <div class="whisker whisker-right-2"></div>
+                        </div>
+                        <div class="mole-face">
+                            <div class="mole-eyes">
+                                <div class="mole-eye"></div>
+                                <div class="mole-eye"></div>
+                            </div>
+                            <div class="mole-nose"></div>
+                            <div class="mole-mouth"></div>
+                        </div>
+                    </div>
+                    <div class="word text-2xl sm:text-4xl font-bold text-gray-800 bg-white py-2 px-6 rounded-lg shadow-md" id="word2">
+                        鐵
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="mole-nose"></div>
-        <div class="mole-mouth"></div>
-       </div>
-      </div>
-      <div class="word" id="word2">
-       鐵
-      </div>
-     </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden game-over-screen text-center flex-1 flex flex-col justify-center items-center">
+            <h2 id="game-over-text" class="text-5xl sm:text-6xl font-extrabold text-indigo-600 mb-6">遊戲結束！</h2>
+            <div id="final-score" class="text-3xl sm:text-4xl font-bold text-gray-700 mb-10">
+                你的分數：0
+            </div>
+            <button class="start-btn text-xl sm:text-2xl font-bold text-white py-3 px-10 rounded-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 transition shadow-lg hover:shadow-xl" id="play-again-btn">
+                再玩一次
+            </button>
+        </div>
     </div>
-   </div>
-   <div id="game-over-screen" class="hidden game-over-screen">
-    <h2 class="game-title" id="game-over-text">遊戲結束！</h2>
-    <div class="final-score" id="final-score">
-     你的分數：0
-    </div><button class="start-btn" id="play-again-btn">再玩一次</button>
-   </div>
-  </div>
-  <script>
-    const defaultConfig = {
-      game_title: "打地鼠學發音",
-      easy_mode_label: "簡單 (60秒)",
-      medium_mode_label: "中等 (45秒)",
-      hard_mode_label: "困難 (30秒)",
-      start_button_text: "開始遊戲",
-      score_label: "分數",
-      combo_label: "連擊",
-      time_label: "時間",
-      game_over_text: "遊戲結束！",
-      play_again_text: "再玩一次"
-    };
 
-    const wordPairs = [
-      { p: "貼", t: "鐵" },
-      { p: "合", t: "核" },
-      { p: "十", t: "實" },
-      { p: "鴨", t: "壓" },
-      { p: "蠟", t: "辣" },
-      { p: "垃", t: "辣" },
-      { p: "攝", t: "舌" },
-      { p: "入", t: "日" },
-      { p: "拾", t: "實" },
-      { p: "濕", t: "室" },
-      { p: "執", t: "質" },
-      { p: "吸", t: "咳" },
-      { p: "泣", t: "一" },
-      { p: "摺", t: "折" },
-      { p: "葉", t: "熱" },
-      { p: "緝", t: "七" },
-      { p: "插", t: "擦" }
-    ];
+    <script>
+        // Configuration for text customization (using the original structure)
+        const defaultConfig = {
+            game_title: "打地鼠學發音",
+            easy_mode_label: "簡單 (60秒)",
+            medium_mode_label: "中等 (45秒)",
+            hard_mode_label: "困難 (30秒)",
+            start_button_text: "開始遊戲",
+            score_label: "分數",
+            combo_label: "連擊",
+            time_label: "時間",
+            game_over_text: "遊戲結束！",
+            play_again_text: "再玩一次"
+        };
 
-    let gameState = {
-      mode: 'easy',
-      timeLimit: 60,
-      score: 0,
-      combo: 0,
-      timeLeft: 60,
-      isPlaying: false,
-      timer: null,
-      currentPair: null,
-      correctSide: null
-    };
+        // Word pairs for the game (p: primary/correct, t: tempting/similar)
+        const wordPairs = [
+            { p: "貼", t: "鐵" }, { p: "合", t: "核" }, { p: "十", t: "實" },
+            { p: "鴨", t: "壓" }, { p: "蠟", t: "辣" }, { p: "攝", t: "舌" },
+            { p: "入", t: "日" }, { p: "拾", t: "實" }, { p: "濕", t: "室" },
+            { p: "執", t: "質" }, { p: "吸", t: "咳" }, { p: "泣", t: "一" },
+            { p: "摺", t: "折" }, { p: "葉", t: "熱" }, { p: "緝", t: "七" },
+            { p: "插", t: "擦" }, { p: "一", t: "憶" }, { p: "急", t: "吉" }
+        ];
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let gameState = {
+            mode: 'easy',
+            timeLimit: 60,
+            score: 0,
+            combo: 0,
+            timeLeft: 60,
+            isPlaying: false,
+            timer: null,
+            currentPair: null,
+            correctSide: null
+        };
 
-    function playSound(frequency, duration, type = 'sine') {
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = frequency;
-      oscillator.type = type;
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + duration);
-    }
+        // --- Audio Functions (Using Tone.js is generally better, but sticking to Oscillator for single-file) ---
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    function playCorrectSound() {
-      playSound(523.25, 0.1);
-      setTimeout(() => playSound(659.25, 0.1), 100);
-      setTimeout(() => playSound(783.99, 0.15), 200);
-    }
-
-    function playWrongSound() {
-      playSound(200, 0.2, 'sawtooth');
-    }
-
-    function playComboSound() {
-      playSound(880, 0.1);
-      setTimeout(() => playSound(1046.5, 0.1), 80);
-      setTimeout(() => playSound(1318.5, 0.15), 160);
-    }
-
-    function playGameOverSound() {
-      playSound(392, 0.15);
-      setTimeout(() => playSound(349.23, 0.15), 150);
-      setTimeout(() => playSound(293.66, 0.3), 300);
-    }
-
-    function updateUI(config) {
-      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
-      document.getElementById('easy-mode-btn').textContent = config.easy_mode_label || defaultConfig.easy_mode_label;
-      document.getElementById('medium-mode-btn').textContent = config.medium_mode_label || defaultConfig.medium_mode_label;
-      document.getElementById('hard-mode-btn').textContent = config.hard_mode_label || defaultConfig.hard_mode_label;
-      document.getElementById('start-btn').textContent = config.start_button_text || defaultConfig.start_button_text;
-      document.getElementById('score-label').textContent = config.score_label || defaultConfig.score_label;
-      document.getElementById('combo-label').textContent = config.combo_label || defaultConfig.combo_label;
-      document.getElementById('time-label').textContent = config.time_label || defaultConfig.time_label;
-      document.getElementById('game-over-text').textContent = config.game_over_text || defaultConfig.game_over_text;
-      document.getElementById('play-again-btn').textContent = config.play_again_text || defaultConfig.play_again_text;
-    }
-
-    async function onConfigChange(config) {
-      updateUI(config);
-    }
-
-    if (window.elementSdk) {
-      window.elementSdk.init({
-        defaultConfig: defaultConfig,
-        onConfigChange: onConfigChange,
-        mapToCapabilities: (config) => ({
-          recolorables: [],
-          borderables: [],
-          fontEditable: undefined,
-          fontSizeable: undefined
-        }),
-        mapToEditPanelValues: (config) => new Map([
-          ["game_title", config.game_title || defaultConfig.game_title],
-          ["easy_mode_label", config.easy_mode_label || defaultConfig.easy_mode_label],
-          ["medium_mode_label", config.medium_mode_label || defaultConfig.medium_mode_label],
-          ["hard_mode_label", config.hard_mode_label || defaultConfig.hard_mode_label],
-          ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
-          ["score_label", config.score_label || defaultConfig.score_label],
-          ["combo_label", config.combo_label || defaultConfig.combo_label],
-          ["time_label", config.time_label || defaultConfig.time_label],
-          ["game_over_text", config.game_over_text || defaultConfig.game_over_text],
-          ["play_again_text", config.play_again_text || defaultConfig.play_again_text]
-        ])
-      });
-    }
-
-    updateUI(defaultConfig);
-
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        gameState.mode = btn.dataset.mode;
-        gameState.timeLimit = btn.dataset.mode === 'easy' ? 60 : btn.dataset.mode === 'medium' ? 45 : 30;
-      });
-    });
-
-    function getRandomPair() {
-      return wordPairs[Math.floor(Math.random() * wordPairs.length)];
-    }
-
-    function displayNewPair() {
-      gameState.currentPair = getRandomPair();
-      gameState.correctSide = Math.random() < 0.5 ? 'left' : 'right';
-
-      const word1 = document.getElementById('word1');
-      const word2 = document.getElementById('word2');
-
-      if (gameState.correctSide === 'left') {
-        word1.textContent = gameState.currentPair.p;
-        word2.textContent = gameState.currentPair.t;
-      } else {
-        word1.textContent = gameState.currentPair.t;
-        word2.textContent = gameState.currentPair.p;
-      }
-
-      document.querySelectorAll('.mole').forEach(mole => {
-        mole.style.animation = 'none';
-        setTimeout(() => mole.style.animation = 'pop-up 0.3s ease-out', 10);
-      });
-    }
-
-    function showFeedback(isCorrect, position) {
-      const feedback = document.createElement('div');
-      feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
-      feedback.textContent = isCorrect ? '✓' : '���';
-      feedback.style.left = position === 'left' ? '25%' : '75%';
-      
-      document.getElementById('game-area').appendChild(feedback);
-      
-      setTimeout(() => feedback.remove(), 500);
-    }
-
-    function handleMoleClick(side) {
-      if (!gameState.isPlaying) return;
-
-      const isCorrect = side === gameState.correctSide;
-
-      if (isCorrect) {
-        playCorrectSound();
-        gameState.combo++;
-        
-        let points = 10;
-        if (gameState.combo >= 3) {
-          points = 30;
-          playComboSound();
+        function playSound(frequency, duration, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
         }
-        
-        gameState.score += points;
-        
-        document.getElementById('score').textContent = gameState.score;
-        document.getElementById('combo').textContent = gameState.combo;
-        
-        if (gameState.combo >= 3) {
-          document.getElementById('combo').classList.add('combo-indicator');
-          setTimeout(() => {
-            document.getElementById('combo').classList.remove('combo-indicator');
-          }, 500);
+
+        function playCorrectSound() {
+            playSound(523.25, 0.1);
+            setTimeout(() => playSound(659.25, 0.1), 100);
+            setTimeout(() => playSound(783.99, 0.15), 200);
         }
-        
-        showFeedback(true, side);
-        displayNewPair();
-      } else {
-        playWrongSound();
-        gameState.combo = 0;
-        document.getElementById('combo').textContent = 0;
-        showFeedback(false, side);
-      }
-    }
 
-    document.getElementById('mole1').addEventListener('click', () => handleMoleClick('left'));
-    document.getElementById('mole2').addEventListener('click', () => handleMoleClick('right'));
-
-    function startGame() {
-      gameState.score = 0;
-      gameState.combo = 0;
-      gameState.timeLeft = gameState.timeLimit;
-      gameState.isPlaying = true;
-
-      document.getElementById('score').textContent = 0;
-      document.getElementById('combo').textContent = 0;
-      document.getElementById('timer').textContent = gameState.timeLeft;
-
-      document.getElementById('menu-screen').classList.add('hidden');
-      document.getElementById('game-screen').classList.remove('hidden');
-      document.getElementById('game-over-screen').classList.add('hidden');
-
-      displayNewPair();
-
-      gameState.timer = setInterval(() => {
-        gameState.timeLeft--;
-        document.getElementById('timer').textContent = gameState.timeLeft;
-
-        if (gameState.timeLeft <= 0) {
-          endGame();
+        function playWrongSound() {
+            playSound(200, 0.2, 'sawtooth');
         }
-      }, 1000);
-    }
 
-    function endGame() {
-      gameState.isPlaying = false;
-      clearInterval(gameState.timer);
-      
-      playGameOverSound();
+        function playComboSound() {
+            playSound(880, 0.1);
+            setTimeout(() => playSound(1046.5, 0.1), 80);
+            setTimeout(() => playSound(1318.5, 0.15), 160);
+        }
 
-      document.getElementById('game-screen').classList.add('hidden');
-      document.getElementById('game-over-screen').classList.remove('hidden');
-      document.getElementById('final-score').textContent = `你的分數：${gameState.score}`;
-    }
+        function playGameOverSound() {
+            playSound(392, 0.15);
+            setTimeout(() => playSound(349.23, 0.15), 150);
+            setTimeout(() => playSound(293.66, 0.3), 300);
+        }
+        // --- End Audio Functions ---
 
-    document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('play-again-btn').addEventListener('click', () => {
-      document.getElementById('game-over-screen').classList.add('hidden');
-      document.getElementById('menu-screen').classList.remove('hidden');
-    });
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad3c440a19de300',t:'MTc2NTYxMTEzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        // Function to update all text elements based on config
+        function updateUI(config) {
+            document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+            document.getElementById('easy-mode-btn').textContent = config.easy_mode_label || defaultConfig.easy_mode_label;
+            document.getElementById('medium-mode-btn').textContent = config.medium_mode_label || defaultConfig.medium_mode_label;
+            document.getElementById('hard-mode-btn').textContent = config.hard_mode_label || defaultConfig.hard_mode_label;
+            document.getElementById('start-btn').textContent = config.start_button_text || defaultConfig.start_button_text;
+            document.getElementById('score-label').textContent = config.score_label || defaultConfig.score_label;
+            document.getElementById('combo-label').textContent = config.combo_label || defaultConfig.combo_label;
+            document.getElementById('time-label').textContent = config.time_label || defaultConfig.time_label;
+            document.getElementById('game-over-text').textContent = config.game_over_text || defaultConfig.game_over_text;
+            document.getElementById('play-again-btn').textContent = config.play_again_text || defaultConfig.play_again_text;
+            // Update labels for the game over screen
+            document.getElementById('game-over-screen').querySelector('h2').textContent = config.game_over_text || defaultConfig.game_over_text;
+        }
+
+        // Initialize UI with default configuration
+        updateUI(defaultConfig);
+
+        // Event listener for mode selection
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            // Apply selected class on initialization for the default mode
+            if (btn.dataset.mode === gameState.mode) {
+                btn.classList.add('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
+                btn.classList.remove('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
+            }
+
+            btn.addEventListener('click', () => {
+                // Remove selection classes from all buttons
+                document.querySelectorAll('.mode-btn').forEach(b => {
+                    b.classList.remove('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
+                    b.classList.add('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
+                });
+
+                // Add selection classes to the clicked button
+                btn.classList.add('selected', 'bg-indigo-600', 'text-white', 'hover:bg-indigo-700', 'shadow-lg');
+                btn.classList.remove('text-indigo-500', 'bg-white', 'hover:bg-indigo-50');
+
+                // Update game state
+                gameState.mode = btn.dataset.mode;
+                gameState.timeLimit = 
+                    btn.dataset.mode === 'easy' ? 60 : 
+                    btn.dataset.mode === 'medium' ? 45 : 30;
+                document.getElementById('timer').textContent = gameState.timeLimit;
+            });
+        });
+
+        // Function to select a random pair of words
+        function getRandomPair() {
+            return wordPairs[Math.floor(Math.random() * wordPairs.length)];
+        }
+
+        // Function to display the new word pair
+        function displayNewPair() {
+            gameState.currentPair = getRandomPair();
+            gameState.correctSide = Math.random() < 0.5 ? 'left' : 'right';
+
+            const word1El = document.getElementById('word1');
+            const word2El = document.getElementById('word2');
+            const mole1El = document.getElementById('mole1').querySelector('.mole');
+            const mole2El = document.getElementById('mole2').querySelector('.mole');
+
+            // Assign the correct (p) and tempting (t) words to the mole containers
+            if (gameState.correctSide === 'left') {
+                word1El.textContent = gameState.currentPair.p;
+                word2El.textContent = gameState.currentPair.t;
+            } else {
+                word1El.textContent = gameState.currentPair.t;
+                word2El.textContent = gameState.currentPair.p;
+            }
+
+            // Re-trigger the pop-up animation
+            [mole1El, mole2El].forEach(mole => {
+                // Necessary trick to restart CSS animation
+                mole.style.animation = 'none';
+                void mole.offsetWidth; // Trigger reflow
+                mole.style.animation = 'pop-up 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.27)';
+            });
+        }
+
+        // Function to show visual feedback (✓ or ✗)
+        function showFeedback(isCorrect, side) {
+            const feedback = document.createElement('div');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+            feedback.textContent = isCorrect ? '✓' : '✗';
+            
+            // Adjust X position based on which mole was clicked (left or right)
+            if (side === 'left') {
+                feedback.style.left = '25%';
+                feedback.style.transform = 'translate(-50%, -50%)'; // Only half translation is needed since we set left: 25%
+            } else {
+                feedback.style.left = '75%';
+                feedback.style.transform = 'translate(-50%, -50%)';
+            }
+            
+            document.getElementById('game-area').appendChild(feedback);
+            
+            setTimeout(() => feedback.remove(), 500); // Remove feedback after animation
+        }
+
+        // Core game logic for handling a mole click
+        function handleMoleClick(side) {
+            if (!gameState.isPlaying) return;
+
+            const isCorrect = side === gameState.correctSide;
+
+            if (isCorrect) {
+                playCorrectSound();
+                gameState.combo++;
+                
+                let points = 10;
+                if (gameState.combo >= 3) {
+                    points = 20; // Bonus points for combo
+                    playComboSound();
+                }
+                
+                gameState.score += points;
+                
+                document.getElementById('score').textContent = gameState.score;
+                document.getElementById('combo').textContent = gameState.combo;
+                
+                // Combo styling
+                const comboEl = document.getElementById('combo');
+                if (gameState.combo >= 3) {
+                    comboEl.classList.add('text-red-500', 'combo-indicator');
+                    setTimeout(() => {
+                        comboEl.classList.remove('text-red-500', 'combo-indicator');
+                    }, 500);
+                }
+                
+                showFeedback(true, side);
+                displayNewPair();
+            } else {
+                playWrongSound();
+                gameState.combo = 0; // Reset combo on mistake
+                document.getElementById('combo').textContent = 0;
+                showFeedback(false, side);
+                // Note: No new pair is displayed on wrong hit to penalize the user more
+            }
+        }
+
+        // Attach click handlers to the mole containers
+        document.getElementById('mole1').addEventListener('click', () => handleMoleClick('left'));
+        document.getElementById('mole2').addEventListener('click', () => handleMoleClick('right'));
+
+        // Start Game function
+        function startGame() {
+            gameState.score = 0;
+            gameState.combo = 0;
+            gameState.timeLeft = gameState.timeLimit;
+            gameState.isPlaying = true;
+
+            document.getElementById('score').textContent = 0;
+            document.getElementById('combo').textContent = 0;
+            document.getElementById('timer').textContent = gameState.timeLeft;
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+
+            displayNewPair();
+
+            // Set up the game timer
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = gameState.timeLeft;
+
+                if (gameState.timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+
+        // End Game function
+        function endGame() {
+            gameState.isPlaying = false;
+            clearInterval(gameState.timer);
+            
+            playGameOverSound();
+
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
+            document.getElementById('final-score').textContent = `你的分數：${gameState.score}`;
+        }
+
+        // Event listeners for game flow
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('play-again-btn').addEventListener('click', () => {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+        });
+
+        // Ensure the correct mode button is selected initially (for refresh)
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector(`.mode-btn[data-mode="${gameState.mode}"]`).click();
+        });
+    </script>
+</body>
 </html>
