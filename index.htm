@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="zh-HK">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>粵語發音遊戲</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: 'PingFang HK', 'Microsoft JhengHei', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .game-container {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      background: white;
+      border-radius: 0;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 5%;
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+    }
+
+    .game-header {
+      text-align: center;
+      margin-bottom: 4%;
+    }
+
+    .game-title {
+      font-size: 8vmin;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 2%;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .mode-selection {
+      display: flex;
+      gap: 3%;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 4%;
+    }
+
+    .mode-btn {
+      padding: 3% 6%;
+      font-size: 4vmin;
+      border: 3px solid #667eea;
+      background: white;
+      color: #667eea;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      min-width: 25%;
+    }
+
+    .mode-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .mode-btn.selected {
+      background: #667eea;
+      color: white;
+    }
+
+    .start-btn {
+      padding: 4% 10%;
+      font-size: 5vmin;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      margin: 0 auto;
+      display: block;
+    }
+
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .game-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 4%;
+      font-size: 4vmin;
+      font-weight: bold;
+      flex-wrap: wrap;
+      gap: 3%;
+    }
+
+    .stat {
+      background: #f0f4ff;
+      padding: 3%;
+      border-radius: 15px;
+      min-width: 28%;
+      text-align: center;
+    }
+
+    .stat-label {
+      color: #667eea;
+      font-size: 3vmin;
+    }
+
+    .stat-value {
+      color: #333;
+      font-size: 5vmin;
+      margin-top: 1%;
+    }
+
+    .combo-indicator {
+      color: #ff6b6b;
+      font-weight: bold;
+      animation: pulse 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    .game-area {
+      flex: 1;
+      display: flex;
+      gap: 5%;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      min-height: 40%;
+    }
+
+    .mole-container {
+      flex: 1;
+      max-width: 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mole-container:hover {
+      transform: scale(1.05);
+    }
+
+    .mole {
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 300px;
+      background: #6B4423;
+      border-radius: 50% 50% 45% 45%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      position: relative;
+      animation: pop-up 0.3s ease-out;
+    }
+
+    @keyframes pop-up {
+      0% { transform: translateY(50px) scale(0.5); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .mole-face {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5%;
+      width: 80%;
+    }
+
+    .mole-eyes {
+      display: flex;
+      gap: 20%;
+      margin-bottom: 2%;
+    }
+
+    .mole-eye {
+      width: 15%;
+      aspect-ratio: 1;
+      background: #000;
+      border-radius: 50%;
+      position: relative;
+    }
+
+    .mole-eye::after {
+      content: '';
+      position: absolute;
+      width: 30%;
+      height: 30%;
+      background: white;
+      border-radius: 50%;
+      top: 20%;
+      left: 20%;
+    }
+
+    .mole-nose {
+      width: 12%;
+      aspect-ratio: 1;
+      background: #FF69B4;
+      border-radius: 50%;
+      margin-bottom: 3%;
+    }
+
+    .mole-mouth {
+      width: 25%;
+      height: 8%;
+      border: 3px solid #000;
+      border-top: none;
+      border-radius: 0 0 50% 50%;
+    }
+
+    .mole-whiskers {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .whisker {
+      position: absolute;
+      width: 25%;
+      height: 2px;
+      background: #333;
+      top: 50%;
+    }
+
+    .whisker-left-1 {
+      left: -20%;
+      transform: rotate(-15deg);
+      transform-origin: right center;
+    }
+
+    .whisker-left-2 {
+      left: -20%;
+      transform: rotate(15deg);
+      transform-origin: right center;
+    }
+
+    .whisker-right-1 {
+      right: -20%;
+      transform: rotate(15deg);
+      transform-origin: left center;
+    }
+
+    .whisker-right-2 {
+      right: -20%;
+      transform: rotate(-15deg);
+      transform-origin: left center;
+    }
+
+    .mole-ears {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .mole-ear {
+      position: absolute;
+      width: 20%;
+      height: 20%;
+      background: #5A3620;
+      border-radius: 50%;
+      top: 15%;
+    }
+
+    .mole-ear-left {
+      left: 5%;
+    }
+
+    .mole-ear-right {
+      right: 5%;
+    }
+
+    .word {
+      margin-top: 5%;
+      font-size: 6vmin;
+      font-weight: bold;
+      color: #333;
+      background: white;
+      padding: 4% 8%;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .feedback {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10vmin;
+      font-weight: bold;
+      animation: feedback-pop 0.5s ease-out;
+      pointer-events: none;
+    }
+
+    @keyframes feedback-pop {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    }
+
+    .correct { color: #4CAF50; }
+    .wrong { color: #ff6b6b; }
+
+    .game-over-screen {
+      text-align: center;
+    }
+
+    .final-score {
+      font-size: 8vmin;
+      color: #667eea;
+      margin-bottom: 5%;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .game-container {
+        padding: 8%;
+      }
+
+      .mode-btn {
+        font-size: 5vmin;
+        min-width: 28%;
+      }
+
+      .game-area {
+        flex-direction: column;
+        gap: 8%;
+      }
+
+      .mole-container {
+        max-width: 70%;
+      }
+    }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      .game-container {
+        padding: 2% 5%;
+      }
+
+      .game-header {
+        margin-bottom: 2%;
+      }
+
+      .mode-selection {
+        margin-bottom: 2%;
+      }
+
+      .game-stats {
+        margin-bottom: 2%;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="game-container">
+   <div id="menu-screen">
+    <div class="game-header">
+     <h1 class="game-title" id="game-title">打地�����學發音</h1>
+    </div>
+    <div class="mode-selection"><button class="mode-btn selected" data-mode="easy" id="easy-mode-btn">簡單 (60秒)</button> <button class="mode-btn" data-mode="medium" id="medium-mode-btn">中等 (45秒)</button> <button class="mode-btn" data-mode="hard" id="hard-mode-btn">困難 (30秒)</button>
+    </div><button class="start-btn" id="start-btn">開始遊戲</button>
+   </div>
+   <div id="game-screen" class="hidden">
+    <div class="game-stats">
+     <div class="stat">
+      <div class="stat-label" id="score-label">
+       分數
+      </div>
+      <div class="stat-value" id="score">
+       0
+      </div>
+     </div>
+     <div class="stat">
+      <div class="stat-label" id="combo-label">
+       連擊
+      </div>
+      <div class="stat-value" id="combo">
+       0
+      </div>
+     </div>
+     <div class="stat">
+      <div class="stat-label" id="time-label">
+       時間
+      </div>
+      <div class="stat-value" id="timer">
+       60
+      </div>
+     </div>
+    </div>
+    <div class="game-area" id="game-area">
+     <div class="mole-container" id="mole1">
+      <div class="mole">
+       <div class="mole-ears">
+        <div class="mole-ear mole-ear-left"></div>
+        <div class="mole-ear mole-ear-right"></div>
+       </div>
+       <div class="mole-whiskers">
+        <div class="whisker whisker-left-1"></div>
+        <div class="whisker whisker-left-2"></div>
+        <div class="whisker whisker-right-1"></div>
+        <div class="whisker whisker-right-2"></div>
+       </div>
+       <div class="mole-face">
+        <div class="mole-eyes">
+         <div class="mole-eye"></div>
+         <div class="mole-eye"></div>
+        </div>
+        <div class="mole-nose"></div>
+        <div class="mole-mouth"></div>
+       </div>
+      </div>
+      <div class="word" id="word1">
+       貼
+      </div>
+     </div>
+     <div class="mole-container" id="mole2">
+      <div class="mole">
+       <div class="mole-ears">
+        <div class="mole-ear mole-ear-left"></div>
+        <div class="mole-ear mole-ear-right"></div>
+       </div>
+       <div class="mole-whiskers">
+        <div class="whisker whisker-left-1"></div>
+        <div class="whisker whisker-left-2"></div>
+        <div class="whisker whisker-right-1"></div>
+        <div class="whisker whisker-right-2"></div>
+       </div>
+       <div class="mole-face">
+        <div class="mole-eyes">
+         <div class="mole-eye"></div>
+         <div class="mole-eye"></div>
+        </div>
+        <div class="mole-nose"></div>
+        <div class="mole-mouth"></div>
+       </div>
+      </div>
+      <div class="word" id="word2">
+       鐵
+      </div>
+     </div>
+    </div>
+   </div>
+   <div id="game-over-screen" class="hidden game-over-screen">
+    <h2 class="game-title" id="game-over-text">遊戲結束！</h2>
+    <div class="final-score" id="final-score">
+     你的分數：0
+    </div><button class="start-btn" id="play-again-btn">再玩一次</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "打地鼠學發音",
+      easy_mode_label: "簡單 (60秒)",
+      medium_mode_label: "中等 (45秒)",
+      hard_mode_label: "困難 (30秒)",
+      start_button_text: "開始遊戲",
+      score_label: "分數",
+      combo_label: "連擊",
+      time_label: "時間",
+      game_over_text: "遊戲結束！",
+      play_again_text: "再玩一次"
+    };
+
+    const wordPairs = [
+      { p: "貼", t: "鐵" },
+      { p: "合", t: "核" },
+      { p: "十", t: "實" },
+      { p: "鴨", t: "壓" },
+      { p: "蠟", t: "辣" },
+      { p: "垃", t: "辣" },
+      { p: "攝", t: "舌" },
+      { p: "入", t: "日" },
+      { p: "拾", t: "實" },
+      { p: "濕", t: "室" },
+      { p: "執", t: "質" },
+      { p: "吸", t: "咳" },
+      { p: "泣", t: "一" },
+      { p: "摺", t: "折" },
+      { p: "葉", t: "熱" },
+      { p: "緝", t: "七" },
+      { p: "插", t: "擦" }
+    ];
+
+    let gameState = {
+      mode: 'easy',
+      timeLimit: 60,
+      score: 0,
+      combo: 0,
+      timeLeft: 60,
+      isPlaying: false,
+      timer: null,
+      currentPair: null,
+      correctSide: null
+    };
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(frequency, duration, type = 'sine') {
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+    }
+
+    function playCorrectSound() {
+      playSound(523.25, 0.1);
+      setTimeout(() => playSound(659.25, 0.1), 100);
+      setTimeout(() => playSound(783.99, 0.15), 200);
+    }
+
+    function playWrongSound() {
+      playSound(200, 0.2, 'sawtooth');
+    }
+
+    function playComboSound() {
+      playSound(880, 0.1);
+      setTimeout(() => playSound(1046.5, 0.1), 80);
+      setTimeout(() => playSound(1318.5, 0.15), 160);
+    }
+
+    function playGameOverSound() {
+      playSound(392, 0.15);
+      setTimeout(() => playSound(349.23, 0.15), 150);
+      setTimeout(() => playSound(293.66, 0.3), 300);
+    }
+
+    function updateUI(config) {
+      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('easy-mode-btn').textContent = config.easy_mode_label || defaultConfig.easy_mode_label;
+      document.getElementById('medium-mode-btn').textContent = config.medium_mode_label || defaultConfig.medium_mode_label;
+      document.getElementById('hard-mode-btn').textContent = config.hard_mode_label || defaultConfig.hard_mode_label;
+      document.getElementById('start-btn').textContent = config.start_button_text || defaultConfig.start_button_text;
+      document.getElementById('score-label').textContent = config.score_label || defaultConfig.score_label;
+      document.getElementById('combo-label').textContent = config.combo_label || defaultConfig.combo_label;
+      document.getElementById('time-label').textContent = config.time_label || defaultConfig.time_label;
+      document.getElementById('game-over-text').textContent = config.game_over_text || defaultConfig.game_over_text;
+      document.getElementById('play-again-btn').textContent = config.play_again_text || defaultConfig.play_again_text;
+    }
+
+    async function onConfigChange(config) {
+      updateUI(config);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig: defaultConfig,
+        onConfigChange: onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["easy_mode_label", config.easy_mode_label || defaultConfig.easy_mode_label],
+          ["medium_mode_label", config.medium_mode_label || defaultConfig.medium_mode_label],
+          ["hard_mode_label", config.hard_mode_label || defaultConfig.hard_mode_label],
+          ["start_button_text", config.start_button_text || defaultConfig.start_button_text],
+          ["score_label", config.score_label || defaultConfig.score_label],
+          ["combo_label", config.combo_label || defaultConfig.combo_label],
+          ["time_label", config.time_label || defaultConfig.time_label],
+          ["game_over_text", config.game_over_text || defaultConfig.game_over_text],
+          ["play_again_text", config.play_again_text || defaultConfig.play_again_text]
+        ])
+      });
+    }
+
+    updateUI(defaultConfig);
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        gameState.mode = btn.dataset.mode;
+        gameState.timeLimit = btn.dataset.mode === 'easy' ? 60 : btn.dataset.mode === 'medium' ? 45 : 30;
+      });
+    });
+
+    function getRandomPair() {
+      return wordPairs[Math.floor(Math.random() * wordPairs.length)];
+    }
+
+    function displayNewPair() {
+      gameState.currentPair = getRandomPair();
+      gameState.correctSide = Math.random() < 0.5 ? 'left' : 'right';
+
+      const word1 = document.getElementById('word1');
+      const word2 = document.getElementById('word2');
+
+      if (gameState.correctSide === 'left') {
+        word1.textContent = gameState.currentPair.p;
+        word2.textContent = gameState.currentPair.t;
+      } else {
+        word1.textContent = gameState.currentPair.t;
+        word2.textContent = gameState.currentPair.p;
+      }
+
+      document.querySelectorAll('.mole').forEach(mole => {
+        mole.style.animation = 'none';
+        setTimeout(() => mole.style.animation = 'pop-up 0.3s ease-out', 10);
+      });
+    }
+
+    function showFeedback(isCorrect, position) {
+      const feedback = document.createElement('div');
+      feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+      feedback.textContent = isCorrect ? '✓' : '���';
+      feedback.style.left = position === 'left' ? '25%' : '75%';
+      
+      document.getElementById('game-area').appendChild(feedback);
+      
+      setTimeout(() => feedback.remove(), 500);
+    }
+
+    function handleMoleClick(side) {
+      if (!gameState.isPlaying) return;
+
+      const isCorrect = side === gameState.correctSide;
+
+      if (isCorrect) {
+        playCorrectSound();
+        gameState.combo++;
+        
+        let points = 10;
+        if (gameState.combo >= 3) {
+          points = 30;
+          playComboSound();
+        }
+        
+        gameState.score += points;
+        
+        document.getElementById('score').textContent = gameState.score;
+        document.getElementById('combo').textContent = gameState.combo;
+        
+        if (gameState.combo >= 3) {
+          document.getElementById('combo').classList.add('combo-indicator');
+          setTimeout(() => {
+            document.getElementById('combo').classList.remove('combo-indicator');
+          }, 500);
+        }
+        
+        showFeedback(true, side);
+        displayNewPair();
+      } else {
+        playWrongSound();
+        gameState.combo = 0;
+        document.getElementById('combo').textContent = 0;
+        showFeedback(false, side);
+      }
+    }
+
+    document.getElementById('mole1').addEventListener('click', () => handleMoleClick('left'));
+    document.getElementById('mole2').addEventListener('click', () => handleMoleClick('right'));
+
+    function startGame() {
+      gameState.score = 0;
+      gameState.combo = 0;
+      gameState.timeLeft = gameState.timeLimit;
+      gameState.isPlaying = true;
+
+      document.getElementById('score').textContent = 0;
+      document.getElementById('combo').textContent = 0;
+      document.getElementById('timer').textContent = gameState.timeLeft;
+
+      document.getElementById('menu-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('game-over-screen').classList.add('hidden');
+
+      displayNewPair();
+
+      gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        document.getElementById('timer').textContent = gameState.timeLeft;
+
+        if (gameState.timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      gameState.isPlaying = false;
+      clearInterval(gameState.timer);
+      
+      playGameOverSound();
+
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('game-over-screen').classList.remove('hidden');
+      document.getElementById('final-score').textContent = `你的分數：${gameState.score}`;
+    }
+
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('play-again-btn').addEventListener('click', () => {
+      document.getElementById('game-over-screen').classList.add('hidden');
+      document.getElementById('menu-screen').classList.remove('hidden');
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ad3c440a19de300',t:'MTc2NTYxMTEzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
